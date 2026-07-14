@@ -1,4 +1,5 @@
 #include <zephyr/device.h>
+#include <drivers/behavior.h>
 #include <zmk/behavior.h>
 #include <status_led/status_led.h>
 
