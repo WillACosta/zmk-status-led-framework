@@ -16,7 +16,7 @@ static int behavior_status_led_battery_keymap_binding_released(struct zmk_behavi
     return 0;
 }
 
-static const struct zmk_behavior_api behavior_status_led_battery_api = {
+static const struct behavior_driver_api behavior_status_led_battery_api = {
     .binding_pressed = behavior_status_led_battery_keymap_binding_pressed,
     .binding_released = behavior_status_led_battery_keymap_binding_released,
 };
@@ -25,6 +25,6 @@ static int behavior_status_led_battery_init(const struct device *dev) {
     return 0;
 }
 
-DEVICE_DT_INST_DEFINE(0, behavior_status_led_battery_init, NULL, NULL, NULL,
-                      APPLICATION, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-                      &behavior_status_led_battery_api);
+BEHAVIOR_DT_INST_DEFINE(0, behavior_status_led_battery_init, NULL, NULL, NULL,
+                        APPLICATION, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
+                        &behavior_status_led_battery_api);
