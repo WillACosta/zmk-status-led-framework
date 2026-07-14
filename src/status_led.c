@@ -177,6 +177,24 @@ ZMK_SUBSCRIPTION(status_led_module, zmk_split_peripheral_status_changed);
 ZMK_SUBSCRIPTION(status_led_module, zmk_usb_conn_state_changed);
 ZMK_SUBSCRIPTION(status_led_module, zmk_battery_state_changed);
 
+void status_led_trigger_battery_check(void) {
+    uint8_t pct = zmk_battery_state_of_charge();
+    LOG_INF("Manual battery check requested. Level: %d%%", pct);
+    struct status_led_rgb color;
+    if (pct > 75) color = STATUS_LED_COLOR_BATTERY_HIGH;
+    else if (pct >= 30) color = STATUS_LED_COLOR_BATTERY_MED;
+    else color = STATUS_LED_COLOR_BATTERY_LOW;
+
+    struct status_led_animation anim = {
+        .type = STATUS_LED_ANIM_SOLID,
+        .color = color,
+        .duration_ms = STATUS_LED_DURATION_BATTERY_MS,
+        .priority = STATUS_LED_PRIO_BATTERY_CHECK,
+        .led_mask = STATUS_LED_MASK_LEFT_INNER | STATUS_LED_MASK_RIGHT_INNER
+    };
+    status_led_play(&anim);
+}
+
 static int status_led_module_init(void) {
     int err = status_led_init();
     if (err) {
@@ -200,3 +218,4 @@ static int status_led_module_init(void) {
 }
 
 SYS_INIT(status_led_module_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
+

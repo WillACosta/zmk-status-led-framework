@@ -7,5 +7,6 @@ if(CONFIG_ZMK_STATUS_LED)
         src/status_led.c
         src/renderer.c
         src/hw_mapping.c
+        src/behavior_status_led_battery.c
     )
 endif()

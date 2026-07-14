@@ -16,14 +16,10 @@ static struct status_led_animation current_anim = {
 static uint32_t anim_elapsed_ms = 0;
 static bool is_sleeping = false;
 
-static void anim_timer_handler(struct k_timer *timer);
+static struct k_work_delayable anim_work;
 
-K_TIMER_DEFINE(anim_timer, anim_timer_handler, NULL);
-
-static void anim_timer_handler(struct k_timer *timer) {
-
+static void anim_work_handler(struct k_work *work) {
     if (is_sleeping || current_anim.priority >= STATUS_LED_PRIO_COUNT) {
-        k_timer_stop(timer);
         return;
     }
 
@@ -32,7 +28,6 @@ static void anim_timer_handler(struct k_timer *timer) {
     if (anim_elapsed_ms >= current_anim.duration_ms) {
         // Animation finished
         current_anim.priority = STATUS_LED_PRIO_COUNT;
-        k_timer_stop(timer);
         
         // Turn off LEDs
         for (int i = 0; i < STATUS_LED_COUNT; i++) {
@@ -95,6 +90,9 @@ static void anim_timer_handler(struct k_timer *timer) {
     }
 
     status_led_hw_update();
+
+    // Reschedule next frame in 50ms
+    k_work_reschedule(&anim_work, K_MSEC(50));
 }
 
 int status_led_init(void) {
@@ -104,6 +102,8 @@ int status_led_init(void) {
     current_anim.priority = STATUS_LED_PRIO_COUNT;
     anim_elapsed_ms = 0;
     is_sleeping = false;
+
+    k_work_init_delayable(&anim_work, anim_work_handler);
 
     return 0;
 }
@@ -116,10 +116,9 @@ int status_led_play(const struct status_led_animation *anim) {
     if (anim->priority <= current_anim.priority) {
         current_anim = *anim;
         anim_elapsed_ms = 0;
-        k_timer_start(&anim_timer, K_NO_WAIT, K_MSEC(50));
         
-        // Run first frame immediately to be highly responsive
-        anim_timer_handler(&anim_timer);
+        // Schedule work immediately
+        k_work_reschedule(&anim_work, K_NO_WAIT);
         return 0;
     }
 
@@ -129,7 +128,7 @@ int status_led_play(const struct status_led_animation *anim) {
 int status_led_clear(void) {
     current_anim.priority = STATUS_LED_PRIO_COUNT;
     anim_elapsed_ms = 0;
-    k_timer_stop(&anim_timer);
+    k_work_cancel_delayable(&anim_work);
 
     for (int i = 0; i < STATUS_LED_COUNT; i++) {
         status_led_hw_set_color(i, STATUS_LED_COLOR_OFF);
@@ -139,7 +138,7 @@ int status_led_clear(void) {
 
 int status_led_sleep(void) {
     is_sleeping = true;
-    k_timer_stop(&anim_timer);
+    k_work_cancel_delayable(&anim_work);
     
     for (int i = 0; i < STATUS_LED_COUNT; i++) {
         status_led_hw_set_color(i, STATUS_LED_COLOR_OFF);
