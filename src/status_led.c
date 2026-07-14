@@ -23,6 +23,7 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
+#if IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL) || !IS_ENABLED(CONFIG_ZMK_SPLIT)
 static struct status_led_rgb get_layer_color(uint8_t layer) {
     uint32_t hex = CONFIG_STATUS_LED_LAYER_DEFAULT_COLOR_HEX;
     if (layer == 1) hex = CONFIG_STATUS_LED_LAYER_1_COLOR_HEX;
@@ -35,6 +36,8 @@ static struct status_led_rgb get_layer_color(uint8_t layer) {
         .b = hex & 0xFF
     };
 }
+#endif
+
 
 static int status_led_event_listener(const zmk_event_t *eh) {
     // 1. Activity State (Sleep/Wake)
@@ -50,6 +53,7 @@ static int status_led_event_listener(const zmk_event_t *eh) {
         return 0;
     }
 
+#if IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL) || !IS_ENABLED(CONFIG_ZMK_SPLIT)
     // 2. BLE Profile Changed
     const struct zmk_ble_active_profile_changed *ble_ev = as_zmk_ble_active_profile_changed(eh);
     if (ble_ev != NULL) {
@@ -90,6 +94,8 @@ static int status_led_event_listener(const zmk_event_t *eh) {
         }
         return 0;
     }
+#endif
+
 
     // 4. Split Connection Changed
     const struct zmk_split_peripheral_status_changed *split_ev = as_zmk_split_peripheral_status_changed(eh);
@@ -162,10 +168,11 @@ static int status_led_event_listener(const zmk_event_t *eh) {
 
 ZMK_LISTENER(status_led_module, status_led_event_listener);
 ZMK_SUBSCRIPTION(status_led_module, zmk_activity_state_changed);
-ZMK_SUBSCRIPTION(status_led_module, zmk_ble_active_profile_changed);
 #if IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL) || !IS_ENABLED(CONFIG_ZMK_SPLIT)
+ZMK_SUBSCRIPTION(status_led_module, zmk_ble_active_profile_changed);
 ZMK_SUBSCRIPTION(status_led_module, zmk_layer_state_changed);
 #endif
+
 ZMK_SUBSCRIPTION(status_led_module, zmk_split_peripheral_status_changed);
 ZMK_SUBSCRIPTION(status_led_module, zmk_usb_conn_state_changed);
 ZMK_SUBSCRIPTION(status_led_module, zmk_battery_state_changed);
