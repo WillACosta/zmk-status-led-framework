@@ -9,7 +9,7 @@ if ZMK_STATUS_LED
 
 config STATUS_LED_BRIGHTNESS
 	int "Default Status LED Brightness"
-	default 20
+	default 80
 	range 0 100
 	help
 	  Default brightness scale percentage (0-100) for the status LEDs.

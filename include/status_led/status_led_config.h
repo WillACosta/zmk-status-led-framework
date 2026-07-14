@@ -20,7 +20,7 @@
 #define STATUS_LED_COLOR_OFF   (struct status_led_rgb){0, 0, 0}
 
 // Durations
-#define STATUS_LED_DURATION_BOOT_MS        1000
+#define STATUS_LED_DURATION_BOOT_MS        2000
 #define STATUS_LED_DURATION_PROFILE_MS     2000
 #define STATUS_LED_DURATION_LAYER_MS       1000
 #define STATUS_LED_DURATION_BATTERY_MS      2000

@@ -206,7 +206,7 @@ static int status_led_module_init(void) {
 
     // Trigger boot animation
     struct status_led_animation boot_anim = {
-        .type = STATUS_LED_ANIM_FADE,
+        .type = STATUS_LED_ANIM_SOLID,
         .color = STATUS_LED_COLOR_GREEN,
         .duration_ms = STATUS_LED_DURATION_BOOT_MS,
         .priority = STATUS_LED_PRIO_BOOT,
