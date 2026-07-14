@@ -3,9 +3,6 @@ description: ZMK Status LED Battery Check behavior
 compatible: "zmk,behavior-status-led-battery"
 
 properties:
-  compatible:
-    type: string
-    required: true
   label:
     type: string
     required: true
