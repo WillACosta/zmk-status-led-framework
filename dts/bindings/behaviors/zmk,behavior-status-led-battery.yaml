@@ -2,10 +2,13 @@ description: ZMK Status LED Battery Check behavior
 
 compatible: "zmk,behavior-status-led-battery"
 
-include: [zmk/behavior.yaml]
-
 properties:
+  compatible:
+    type: string
+    required: true
   label:
+    type: string
     required: true
   "#binding-cells":
+    type: int
     const: 0
