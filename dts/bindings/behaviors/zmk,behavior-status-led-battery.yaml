@@ -2,7 +2,7 @@ description: ZMK Status LED Battery Check behavior
 
 compatible: "zmk,behavior-status-led-battery"
 
-include: [behavior.yaml]
+include: [zmk/behavior.yaml]
 
 properties:
   label:
