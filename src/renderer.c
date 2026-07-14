@@ -16,9 +16,12 @@ static struct status_led_animation current_anim = {
 static uint32_t anim_elapsed_ms = 0;
 static bool is_sleeping = false;
 
-static struct k_timer anim_timer;
+static void anim_timer_handler(struct k_timer *timer);
+
+K_TIMER_DEFINE(anim_timer, anim_timer_handler, NULL);
 
 static void anim_timer_handler(struct k_timer *timer) {
+
     if (is_sleeping || current_anim.priority >= STATUS_LED_PRIO_COUNT) {
         k_timer_stop(timer);
         return;
@@ -93,8 +96,6 @@ static void anim_timer_handler(struct k_timer *timer) {
 
     status_led_hw_update();
 }
-
-K_TIMER_DEFINE(anim_timer, anim_timer_handler, NULL);
 
 int status_led_init(void) {
     int err = status_led_hw_init();
